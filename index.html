@@ -1,0 +1,332 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Combat-less ARPG</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background-color: #000000;
+            }
+            canvas {
+                display: block;
+                margin: auto;
+                border: 1px solid #ccc;
+                background-color: #000000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+        <script>
+                    const canvas = document.getElementById("gameCanvas");
+                    const ctx = canvas.getContext("2d");
+                    const cellSize = 50;
+                    const size = 50;
+                    const bagPadding = 10;
+                    
+                    // Bag dimensions and position
+                    const bagXpos = 50;
+                    const bagYpos = 240;
+                    const bagWidth = 320;
+                    const bagHeight = 600;
+                    let mainWidth = 800;
+                    let mainHeight = 600;
+
+                    // Array to store items
+                    const items = [];
+                    let draggedItem = null;
+                    // Array to store cells in the bag grid
+                    const bagGrid = [];
+                    let numColumns = 8;
+                    let numRows = 10;
+                    
+
+                    class cell {
+                        constructor(id, pXval, pYval) {
+                            this.id = id;
+                            this.x = pXval;
+                            this.y = pYval;
+                            this.isOccupied = false;
+                            this.isHighlighted = false;
+                            
+                        }
+                    }
+                    class newbagCells {
+                        constructor() {
+                            this.cells = []
+                        }
+                    }
+
+            const numbers = [];
+            const columns = 8;
+            const rows = 10;
+            let bagCells = new newbagCells; 
+ let index = 0;
+            for (let i = 0; i < rows; i++) {
+                numbers[i] = [];
+                for (let j = 0; j < columns; j++){
+                    numbers[i][j] = j + 1 + (i*columns);
+                    let newC = new cell(index, bagXpos + bagPadding + (j * cellSize) ,bagYpos + bagPadding + (i * cellSize));
+                    index++
+                     bagCells.cells.push(newC);
+
+                }
+            }
+            console.log(bagCells);
+            console.log(numbers); 
+
+            function getRandomElement(arrayToPickFrom) {
+              return arrayToPickFrom[Math.floor(Math.random()*arrayToPickFrom.length)]
+            }
+
+
+
+            class ItemAdjective {
+              constructor(pWord, pValue) {
+                this.word = pWord;
+                this.value = pValue;
+              }
+            }
+
+                function getBelievableItemName() {
+                  const owners = ["Jeff", "Andrew", "Stik", "Joe", "Catherine", "Egg", "Plant"];
+                  const adjectives = [
+                      new ItemAdjective("Great", 3.0),
+                      new ItemAdjective("Crappy", -2.0),
+                      new ItemAdjective("Small", 0.9),
+                      new ItemAdjective("Blue", 83)];
+                  const things = ["Weapon", "Armor", "Ring", "Potion"]; 
+                  const owner = getRandomElement(owners);
+                  const adjective = getRandomElement(adjectives);
+                  const thing = getRandomElement(things);
+                      // Calculate gridSizeX and gridSizeY based on the item type
+                    if (thing === "Weapon" || thing === "Armor") {
+                        gridSizeX = 2;
+                        gridSizeY = getRandomInt(2, 4); // Random number between 2 and 4 for gridSizeY
+                    } else {
+                        gridSizeX = 1;
+                        gridSizeY = 1;
+                    }
+                  
+                  return [owner + "'s " + adjective.word + " " + thing, adjective.value, thing, gridSizeX, gridSizeY];
+                }
+
+
+                // Function to handle mouse down event
+                canvas.addEventListener("mousedown", function(event) {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+
+                    // Check if mouse click is inside any item
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i];
+                        if (mouseX >= item.x && mouseX <= item.x + item.size &&
+                            mouseY >= item.y && mouseY <= item.y + item.size) {
+                            // Set dragging flag and save offset
+                            item.isDragging = true;
+                            item.dragOffsetX = mouseX - item.x;
+                            item.dragOffsetY = mouseY - item.y;
+                            
+                            // Set the dragged item
+                            draggedItem = item;
+                            console.log(draggedItem)
+                        
+                            break;
+                        }
+                        
+                    }
+                                    
+                });
+
+                // Function to handle mouse up event
+                canvas.addEventListener("mouseup", function(event) {
+                    // Reset dragging flag
+                    if (draggedItem) {
+                        draggedItem.isDragging = false;
+                        draggedItem = null;
+                    }
+                });
+
+                // Function to handle mouse move event
+                canvas.addEventListener("mousemove", function(event) {
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+
+                    // Update position of dragged item
+                    if (draggedItem) {
+                        draggedItem.x = mouseX - draggedItem.dragOffsetX;
+                        draggedItem.y = mouseY - draggedItem.dragOffsetY;
+                        draggedItem.sizeX = draggedItem.size * draggedItem.gridSizeX;
+                        draggedItem.sizeY = draggedItem.size * draggedItem.gridSizeY;
+
+
+                                
+                    }
+                });
+                
+                        // Function to check if item is over the bag grid
+                function isOverBagGrid(item) {
+                    return (
+                        item.x >= bagXpos &&
+                        item.x + item.size <= bagXpos + bagWidth &&
+                        item.y >= bagYpos &&
+                        item.y + item.size <= bagYpos + bagHeight
+                    );
+                }
+
+
+        // Function to handle cell highlighting when an item is dragged
+        function highlightCellsForItem(item) {
+            for (let i = 0; i < bagCells.cells.length; i++) {
+                const cell = bagCells.cells[i];
+
+                
+                // Check if the cell falls within the range of the item
+                if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
+
+                    cell.isHighlighted = true;
+                    ctx.fillStyle = "rgba(0, 0, 255, 0.5)"; 
+                    ctx.fillRect(cell.x, cell.y, ((item.size * 2) * item.gridSizeX), ((item.size * 2) * item.gridSizeY));
+
+      
+                    
+                } else {
+                    // Set the cell's isHighlighted property to false if it's not within the range
+                    cell.isHighlighted = false;
+                }
+            }
+        }
+
+        // Function to draw grid inside the bag
+        function drawBagGrid() {
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 1;
+
+            const numColumns = 8;
+            const numRows = 10;
+            const cellSize = 50;
+
+            // Draw vertical lines
+            for (let i = 0; i <= numColumns; i++) {
+                const x = bagXpos + bagPadding + i * cellSize;
+                ctx.moveTo(x, bagYpos + bagPadding);
+                ctx.lineTo(x, bagYpos + bagPadding + numRows * cellSize);
+            }
+
+            // Draw horizontal lines
+            for (let j = 0; j <= numRows; j++) {
+                const y = bagYpos + bagPadding + j * cellSize;
+                ctx.moveTo(bagXpos + bagPadding, y);
+                ctx.lineTo(bagXpos + bagPadding + numColumns * cellSize, y);
+            }
+
+            ctx.stroke();
+        }
+
+                        // Function to create a new item
+                function createItem(x, y, value) {
+                    const iteminfo = getBelievableItemName();
+                    return {
+                        x: x,
+                        y: y,
+                        size: 25,
+                        color:`rgb(${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, ${getRandomInt(0, 255)})`, // Random color,
+                        name: iteminfo[0],
+                        value: value * iteminfo[1],
+                        type: iteminfo[2],
+                        gridSizeX: iteminfo[3],
+                        gridSizeY: iteminfo[4],
+                        isDragging: false,
+                        dragOffsetX: 0,
+                        dragOffsetY: 0
+                    };
+                }
+
+
+
+                // Function to render items and bag grid
+                function render() {
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Render main window border
+                    ctx.strokeStyle = "white";
+                    ctx.strokeRect(560, 240, mainWidth, mainHeight);
+
+                    // Render bag border
+                    ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
+
+
+                    // Render bag grid
+                    drawBagGrid();
+
+                    // Highlight cells based on item dragging
+                    if (draggedItem) {
+                        highlightCellsForItem(draggedItem);
+                    }
+
+                    // Render items
+                    items.forEach(item => {
+                        ctx.fillStyle = item.color;
+                    const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
+                    const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
+                        ctx.fillRect(item.x, item.y, item.size, item.size);
+                            if (item.isDragging) {
+                            // Adjusted size for dragging
+                            ctx.fillStyle = item.color;
+                            ctx.fillRect(item.x, item.y, (item.size * 1.75 ) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY); 
+                            // Render tooltip
+                            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                            const text = item.name;
+                            const textWidth = ctx.measureText(text).width;
+                            ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
+                            ctx.fillStyle = "black";
+                            ctx.font = "12px Arial";
+                            ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
+                            ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
+                            ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
+                            
+            } else {
+                        ctx.fillStyle = item.color;
+                        ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
+            } // Adjusted size for dragging
+
+                        
+                                    });
+                }
+
+                // Main game loop
+                function gameLoop() {
+                    render();
+                    requestAnimationFrame(gameLoop);
+                }
+
+                // Function to generate a random integer between min and max (inclusive)
+                function getRandomInt(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                }
+
+                // Initialize items array with random number of items between 3 and 5
+                const numItems = getRandomInt(3, 5);
+                for (let i = 0; i < numItems; i++) {
+                    const x = getRandomInt(560, 560 + mainWidth - size); // Random x-coordinate within the canvas
+                    const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
+                    items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
+                }
+
+                    // Start the game loop
+                    gameLoop();
+
+
+        </script>
+    </body>
+    </html>
+
+
