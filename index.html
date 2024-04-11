@@ -55,11 +55,14 @@
                             this.isHighlighted = false; 
 							
                         }
-					 drawCell(pcellx,pcelly){
-						 const ctx = canvas.getContext("2d");
+					 drawCell(){
+						const ctx = canvas.getContext("2d");
+						ctx.beginPath();
+						ctx.lineWidth = "1";
 						ctx.strokeStyle = "white";
-						ctx.strokeRect((bagXpos + bagPadding + (pcellx * cellSize)),(bagYpos + bagPadding + (pcelly * cellSize)), cellSize,cellSize)
-						if (this.isOccupied = true) { ctx.strokeStyle = 'red' , ctx.strokeStyle = 'blue';}
+						ctx.rect(this.x, this.y, cellSize,cellSize);
+						ctx.stroke();
+						
 						}
                     }
                     class cellsContainer {
@@ -67,11 +70,15 @@
                             this.cells = []
                         }
                     }
-					            const numbers = [];
+			const calc = new cell();
+			const result = calc.drawCell();
+			
+			const numbers = [];
             const columns = 8;
             const rows = 10;
             let bagCells = new cellsContainer; 
-function renderCells() {
+			
+function initCells() {
 
 			let index = 0;
             for (let i = 0; i < rows; i++) {
@@ -79,14 +86,12 @@ function renderCells() {
                 for (let j = 0; j < columns; j++){
                     numbers[i][j] = j + 1 + (i*columns);
                     let newC = new cell(index, bagXpos + bagPadding + (j * cellSize) ,bagYpos + bagPadding + (i * cellSize));
-					newC.drawCell(j,i);
                     index++
                      bagCells.cells.push(newC);
 
                 }
             }
-            console.log(bagCells);
-            console.log(numbers); 
+
 }
             function getRandomElement(arrayToPickFrom) {
               return arrayToPickFrom[Math.floor(Math.random()*arrayToPickFrom.length)]
@@ -212,31 +217,6 @@ function renderCells() {
             }
         }
 
-        // Function to draw grid inside the bag
-        function drawBagGrid() {
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 1;
-
-            const numColumns = 8;
-            const numRows = 10;
-            const cellSize = 50;
-
-            // Draw vertical lines
-            for (let i = 0; i <= numColumns; i++) {
-                const x = bagXpos + bagPadding + i * cellSize;
-                ctx.moveTo(x, bagYpos + bagPadding);
-                ctx.lineTo(x, bagYpos + bagPadding + numRows * cellSize);
-            }
-
-            // Draw horizontal lines
-            for (let j = 0; j <= numRows; j++) {
-                const y = bagYpos + bagPadding + j * cellSize;
-                ctx.moveTo(bagXpos + bagPadding, y);
-                ctx.lineTo(bagXpos + bagPadding + numColumns * cellSize, y);
-            }
-
-            ctx.stroke();
-        }
 
                         // Function to create a new item
                 function createItem(x, y, value) {
@@ -256,6 +236,7 @@ function renderCells() {
                         dragOffsetY: 0
                     };
                 }
+				
 
 
 
@@ -263,23 +244,22 @@ function renderCells() {
                 function render() {
                     // Clear canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                    // Render main window border
+					// Render main window border
                     ctx.strokeStyle = "white";
                     ctx.strokeRect(560, 240, mainWidth, mainHeight);
-
                     // Render bag border
                     ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
-
-
-                    // Render bag grid
-                    //drawBagGrid();
-					renderCells();
-
+					//render cells
+						bagCells.cells.forEach(cell => {
+						cell.drawCell();
+					
+					});
                     // Highlight cells based on item dragging
                     if (draggedItem) {
                         highlightCellsForItem(draggedItem);
                     }
+
+
 
                     // Render items
                     items.forEach(item => {
@@ -314,7 +294,7 @@ function renderCells() {
                 // Main game loop
                 function gameLoop() {
                     render();
-                    requestAnimationFrame(gameLoop);
+                    //requestAnimationFrame(gameLoop);
                 }
 
                 // Function to generate a random integer between min and max (inclusive)
@@ -329,10 +309,12 @@ function renderCells() {
                     const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
                     items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
                 }
-
+					
+					
+					// Render bag grid
+					initCells();
                     // Start the game loop
-                    gameLoop();
-
+                    setInterval(gameLoop, 33);
 
         </script>
     </body>
