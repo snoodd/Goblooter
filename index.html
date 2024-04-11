@@ -9,7 +9,7 @@
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
-                background-color: #BB0000;
+                background-color: #000000;
             }
             canvas {
                 display: block;
@@ -52,26 +52,34 @@
                             this.x = pXval;
                             this.y = pYval;
                             this.isOccupied = false;
-                            this.isHighlighted = false;
-                            
+                            this.isHighlighted = false; 
+							
                         }
+					 drawCell(pcellx,pcelly){
+						 const ctx = canvas.getContext("2d");
+						ctx.strokeStyle = "white";
+						ctx.strokeRect((bagXpos + bagPadding + (pcellx * cellSize)),(bagYpos + bagPadding + (pcelly * cellSize)), cellSize,cellSize)
+						if (this.isOccupied = true) { ctx.strokeStyle = 'red' , ctx.strokeStyle = 'blue';}
+						}
                     }
-                    class newbagCells {
+                    class cellsContainer {
                         constructor() {
                             this.cells = []
                         }
                     }
-
-            const numbers = [];
+					            const numbers = [];
             const columns = 8;
             const rows = 10;
-            let bagCells = new newbagCells; 
- let index = 0;
+            let bagCells = new cellsContainer; 
+function renderCells() {
+
+			let index = 0;
             for (let i = 0; i < rows; i++) {
                 numbers[i] = [];
                 for (let j = 0; j < columns; j++){
                     numbers[i][j] = j + 1 + (i*columns);
                     let newC = new cell(index, bagXpos + bagPadding + (j * cellSize) ,bagYpos + bagPadding + (i * cellSize));
+					newC.drawCell(j,i);
                     index++
                      bagCells.cells.push(newC);
 
@@ -79,7 +87,7 @@
             }
             console.log(bagCells);
             console.log(numbers); 
-
+}
             function getRandomElement(arrayToPickFrom) {
               return arrayToPickFrom[Math.floor(Math.random()*arrayToPickFrom.length)]
             }
@@ -265,7 +273,8 @@
 
 
                     // Render bag grid
-                    drawBagGrid();
+                    //drawBagGrid();
+					renderCells();
 
                     // Highlight cells based on item dragging
                     if (draggedItem) {
