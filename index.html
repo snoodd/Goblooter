@@ -22,7 +22,9 @@
     <body>
         <canvas id="gameCanvas" width="1920" height="1080"></canvas>
 
-        <script>
+		<script src="bagFunctions.js"></script>
+		<script src="items.js"></script>
+		<script>
                     const canvas = document.getElementById("gameCanvas");
                     const ctx = canvas.getContext("2d");
                     const cellSize = 50;
@@ -46,88 +48,11 @@
                     let numRows = 10;
                     
 
-                    class cell {
-                        constructor(id, pXval, pYval) {
-                            this.id = id;
-                            this.x = pXval;
-                            this.y = pYval;
-                            this.isOccupied = false;
-                            this.isHighlighted = false; 
-							
-                        }
-					 drawCell(){
-						const ctx = canvas.getContext("2d");
-						ctx.beginPath();
-						ctx.lineWidth = "1";
-						ctx.strokeStyle = "white";
-						ctx.rect(this.x, this.y, cellSize,cellSize);
-						ctx.stroke();
-						
-						}
-                    }
-                    class cellsContainer {
-                        constructor() {
-                            this.cells = []
-                        }
-                    }
-			const calc = new cell();
-			const result = calc.drawCell();
-			
 			const numbers = [];
             const columns = 8;
             const rows = 10;
             let bagCells = new cellsContainer; 
 			
-function initCells() {
-
-			let index = 0;
-            for (let i = 0; i < rows; i++) {
-                numbers[i] = [];
-                for (let j = 0; j < columns; j++){
-                    numbers[i][j] = j + 1 + (i*columns);
-                    let newC = new cell(index, bagXpos + bagPadding + (j * cellSize) ,bagYpos + bagPadding + (i * cellSize));
-                    index++
-                     bagCells.cells.push(newC);
-
-                }
-            }
-
-}
-            function getRandomElement(arrayToPickFrom) {
-              return arrayToPickFrom[Math.floor(Math.random()*arrayToPickFrom.length)]
-            }
-
-
-
-            class ItemAdjective {
-              constructor(pWord, pValue) {
-                this.word = pWord;
-                this.value = pValue;
-              }
-            }
-
-                function getBelievableItemName() {
-                  const owners = ["Jeff", "Andrew", "Stik", "Joe", "Catherine", "Egg", "Plant"];
-                  const adjectives = [
-                      new ItemAdjective("Great", 3.0),
-                      new ItemAdjective("Crappy", -2.0),
-                      new ItemAdjective("Small", 0.9),
-                      new ItemAdjective("Blue", 83)];
-                  const things = ["Weapon", "Armor", "Ring", "Potion"]; 
-                  const owner = getRandomElement(owners);
-                  const adjective = getRandomElement(adjectives);
-                  const thing = getRandomElement(things);
-                      // Calculate gridSizeX and gridSizeY based on the item type
-                    if (thing === "Weapon" || thing === "Armor") {
-                        gridSizeX = 2;
-                        gridSizeY = getRandomInt(2, 4); // Random number between 2 and 4 for gridSizeY
-                    } else {
-                        gridSizeX = 1;
-                        gridSizeY = 1;
-                    }
-                  
-                  return [owner + "'s " + adjective.word + " " + thing, adjective.value, thing, gridSizeX, gridSizeY];
-                }
 
 
                 // Function to handle mouse down event
@@ -184,60 +109,6 @@ function initCells() {
                     }
                 });
                 
-                        // Function to check if item is over the bag grid
-                function isOverBagGrid(item) {
-                    return (
-                        item.x >= bagXpos &&
-                        item.x + item.size <= bagXpos + bagWidth &&
-                        item.y >= bagYpos &&
-                        item.y + item.size <= bagYpos + bagHeight
-                    );
-                }
-
-
-        // Function to handle cell highlighting when an item is dragged
-        function highlightCellsForItem(item) {
-            for (let i = 0; i < bagCells.cells.length; i++) {
-                const cell = bagCells.cells[i];
-
-                
-                // Check if the cell falls within the range of the item
-                if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
-
-                    cell.isHighlighted = true;
-                    ctx.fillStyle = "rgba(0, 0, 255, 0.5)"; 
-                    ctx.fillRect(cell.x, cell.y, ((item.size * 2) * item.gridSizeX), ((item.size * 2) * item.gridSizeY));
-
-      
-                    
-                } else {
-                    // Set the cell's isHighlighted property to false if it's not within the range
-                    cell.isHighlighted = false;
-                }
-            }
-        }
-
-
-                        // Function to create a new item
-                function createItem(x, y, value) {
-                    const iteminfo = getBelievableItemName();
-                    return {
-                        x: x,
-                        y: y,
-                        size: 25,
-                        color:`rgb(${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, ${getRandomInt(0, 255)})`, // Random color,
-                        name: iteminfo[0],
-                        value: value * iteminfo[1],
-                        type: iteminfo[2],
-                        gridSizeX: iteminfo[3],
-                        gridSizeY: iteminfo[4],
-                        isDragging: false,
-                        dragOffsetX: 0,
-                        dragOffsetY: 0
-                    };
-                }
-				
-
 
 
                 // Function to render items and bag grid
@@ -294,7 +165,7 @@ function initCells() {
                 // Main game loop
                 function gameLoop() {
                     render();
-                    //requestAnimationFrame(gameLoop);
+
                 }
 
                 // Function to generate a random integer between min and max (inclusive)
