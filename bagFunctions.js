@@ -7,15 +7,16 @@
                             this.x = pXval;
                             this.y = pYval;
                             this.isOccupied = false;
-                            this.isHighlighted = false; 
+                            this.isHighlighted = false;
+                            this.color = ""; 
 							
                         }
 					 drawCell(){
 						const ctx = canvas.getContext("2d");
 						ctx.beginPath();
 						ctx.lineWidth = "1";
-						ctx.strokeStyle = "white";
-						ctx.rect(this.x, this.y, cellSize,cellSize);
+						ctx.fillStyle = this.color; 
+						ctx.fillRect(this.x, this.y, cellSize,cellSize);
 						ctx.stroke();
 						
 						}
@@ -34,6 +35,14 @@
 								for (let j = 0; j < columns; j++){
 									numbers[i][j] = j + 1 + (i*columns);
 									let newC = new cell(index, bagXpos + bagPadding + (j * cellSize) ,bagYpos + bagPadding + (i * cellSize));
+									 if((i+j) % 2 === 0)
+                                                        {
+                                                            newC.color = "rgba(255, 255, 255, 0.5)";
+                                                        } 
+                                                        else
+                                                        {
+                                                            newC.color = "rgba(255, 255, 255, 0.25)";
+                                                        }
 									index++
 									 bagCells.cells.push(newC);
 

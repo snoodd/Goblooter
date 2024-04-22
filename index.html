@@ -122,6 +122,7 @@
                     ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
 					//render cells
 						bagCells.cells.forEach(cell => {
+
 						cell.drawCell();
 					
 					});
@@ -132,26 +133,26 @@
 
 
 
-                    // Render items
-                    items.forEach(item => {
-                        ctx.fillStyle = item.color;
-                    const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
-                    const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
-                        ctx.fillRect(item.x, item.y, item.size, item.size);
-                            if (item.isDragging) {
+            // Render items
+            items.forEach(item => {
+                ctx.fillStyle = item.color;
+            const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
+            const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
+            ctx.fillRect(item.x, item.y, item.size, item.size);
+                    if (item.isDragging) {
                             // Adjusted size for dragging
-                            ctx.fillStyle = item.color;
-                            ctx.fillRect(item.x, item.y, (item.size * 1.75 ) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY); 
+                        ctx.fillStyle = item.color;
+                        ctx.fillRect(item.x, item.y, (item.size * 1.75 ) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY); 
                             // Render tooltip
-                            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-                            const text = item.name;
-                            const textWidth = ctx.measureText(text).width;
-                            ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
-                            ctx.fillStyle = "black";
-                            ctx.font = "12px Arial";
-                            ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
-                            ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
-                            ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                        const text = item.name;
+                        const textWidth = ctx.measureText(text).width;
+                        ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
+                        ctx.fillStyle = "black";
+                        ctx.font = "12px Arial";
+                        ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
+                        ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
+                        ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
                             
             } else {
                         ctx.fillStyle = item.color;

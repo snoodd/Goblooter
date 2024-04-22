@@ -18,6 +18,7 @@
                         gridSizeX: iteminfo[3],
                         gridSizeY: iteminfo[4],
                         isDragging: false,
+                        isInBag: false,
                         dragOffsetX: 0,
                         dragOffsetY: 0
                     };
