@@ -2,8 +2,8 @@
 
 //Function to initialize the cells 
 class cell {
-    constructor(id, pXval, pYval) {
-        this.id = id;
+    constructor(position, pXval, pYval) {
+        this.position = position;
         this.x = pXval;
         this.y = pYval;
         this.isOccupied = false;
@@ -34,7 +34,8 @@ function initCells() {
         numbers[i] = [];
         for (let j = 0; j < columns; j++) {
             numbers[i][j] = j + 1 + (i * columns);
-            let newC = new cell(index, bagXpos + bagPadding + (j * cellSize), bagYpos + bagPadding + (i * cellSize));
+            let newC = new cell([i,j], bagXpos + bagPadding + (j * cellSize), bagYpos + bagPadding + (i * cellSize));
+			console.log(newC);
             if ((i + j) % 2 === 0) {
                 newC.color = "rgba(255, 255, 255, 0.5)";
             } else {
@@ -91,8 +92,6 @@ function highlightCellsForItem(item) {
 
         if (startX <= cellEndX && endX >= cell.x && startY <= cellEndY && endY >= cell.y) {
             cell.isHighlighted = true;
-			cell.isOccupied = true;
-			item.isInBag = true;
             if (!cell.isOccupied) {
                 ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
             } else {
@@ -102,7 +101,6 @@ function highlightCellsForItem(item) {
             ctx.fillRect(cell.x, cell.y, cellSize, cellSize);
         } else {
             cell.isHighlighted = false;
-			cell.isOccupied = false;
         }
     }
 }
