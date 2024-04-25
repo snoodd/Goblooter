@@ -26,167 +26,177 @@
 		<script src="items.js"></script>
 		<script>
                     const canvas = document.getElementById("gameCanvas");
-                    const ctx = canvas.getContext("2d");
-                    const cellSize = 50;
-                    const size = 50;
-                    const bagPadding = 10;
-                    
-                    // Bag dimensions and position
-                    const bagXpos = 50;
-                    const bagYpos = 240;
-                    const bagWidth = 320;
-                    const bagHeight = 600;
-                    let mainWidth = 800;
-                    let mainHeight = 600;
+const ctx = canvas.getContext("2d");
+const cellSize = 50;
+const size = 50;
+const bagPadding = 10;
 
-                    // Array to store items
-                    const items = [];
-                    let draggedItem = null;
-                    // Array to store cells in the bag grid
-                    const bagGrid = [];
-                    let numColumns = 8;
-                    let numRows = 10;
-                    
+// Bag dimensions and position
+const bagXpos = 50;
+const bagYpos = 240;
+const bagWidth = 320;
+const bagHeight = 600;
+let mainWidth = 800;
+let mainHeight = 600;
 
-			const numbers = [];
-            const columns = 8;
-            const rows = 10;
-            let bagCells = new cellsContainer; 
-			
+// Array to store items
+const items = [];
+const baggedItems = [];
+let draggedItem = null;
+// Array to store cells in the bag grid
+const bagGrid = [];
+let numColumns = 8;
+let numRows = 10;
 
 
-                // Function to handle mouse down event
-                canvas.addEventListener("mousedown", function(event) {
-                    const rect = canvas.getBoundingClientRect();
-                    const mouseX = event.clientX - rect.left;
-                    const mouseY = event.clientY - rect.top;
-
-                    // Check if mouse click is inside any item
-                    for (let i = 0; i < items.length; i++) {
-                        const item = items[i];
-                        if (mouseX >= item.x && mouseX <= item.x + item.size &&
-                            mouseY >= item.y && mouseY <= item.y + item.size) {
-                            // Set dragging flag and save offset
-                            item.isDragging = true;
-                            item.dragOffsetX = mouseX - item.x;
-                            item.dragOffsetY = mouseY - item.y;
-                            
-                            // Set the dragged item
-                            draggedItem = item;
-                            console.log(draggedItem)
-                        
-                            break;
-                        }
-                        
-                    }
-                                    
-                });
-
-                // Function to handle mouse up event
-                canvas.addEventListener("mouseup", function(event) {
-                    // Reset dragging flag
-                    if (draggedItem) {
-                        draggedItem.isDragging = false;
-                        draggedItem = null;
-                    }
-                });
-
-                // Function to handle mouse move event
-                canvas.addEventListener("mousemove", function(event) {
-                    const rect = canvas.getBoundingClientRect();
-                    const mouseX = event.clientX - rect.left;
-                    const mouseY = event.clientY - rect.top;
-
-                    // Update position of dragged item
-                    if (draggedItem) {
-                        draggedItem.x = mouseX - draggedItem.dragOffsetX;
-                        draggedItem.y = mouseY - draggedItem.dragOffsetY;
-                        draggedItem.sizeX = draggedItem.size * draggedItem.gridSizeX;
-                        draggedItem.sizeY = draggedItem.size * draggedItem.gridSizeY;
-
-
-                                
-                    }
-                });
-                
-
-
-                // Function to render items and bag grid
-                function render() {
-                    // Clear canvas
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-					// Render main window border
-                    ctx.strokeStyle = "white";
-                    ctx.strokeRect(560, 240, mainWidth, mainHeight);
-                    // Render bag border
-                    ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
-					//render cells
-						bagCells.cells.forEach(cell => {
-
-						cell.drawCell();
-					
-					});
-                    // Highlight cells based on item dragging
-                    if (draggedItem) {
-                        highlightCellsForItem(draggedItem);
-                    }
+const numbers = [];
+const columns = 8;
+const rows = 10;
+let bagCells = new cellsContainer;
 
 
 
-            // Render items
-            items.forEach(item => {
-                ctx.fillStyle = item.color;
-            const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
-            const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
-            ctx.fillRect(item.x, item.y, item.size, item.size);
-                    if (item.isDragging) {
-                            // Adjusted size for dragging
-                        ctx.fillStyle = item.color;
-                        ctx.fillRect(item.x, item.y, (item.size * 1.75 ) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY); 
-                            // Render tooltip
-                        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-                        const text = item.name;
-                        const textWidth = ctx.measureText(text).width;
-                        ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
-                        ctx.fillStyle = "black";
-                        ctx.font = "12px Arial";
-                        ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
-                        ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
-                        ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
-                            
-            } else {
-                        ctx.fillStyle = item.color;
-                        ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
-            } // Adjusted size for dragging
+// Function to handle mouse down event
+canvas.addEventListener("mousedown", function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
 
-                        
-                                    });
-                }
+    // Check if mouse click is inside any item
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (mouseX >= item.x && mouseX <= item.x + item.size &&
+            mouseY >= item.y && mouseY <= item.y + item.size) {
+            // Set dragging flag and save offset
+            item.isDragging = true;
+            item.dragOffsetX = mouseX - item.x;
+            item.dragOffsetY = mouseY - item.y;
 
-                // Main game loop
-                function gameLoop() {
-                    render();
+            // Set the dragged item
+            draggedItem = item;
+            console.log(draggedItem)
 
-                }
+            break;
+        }
 
-                // Function to generate a random integer between min and max (inclusive)
-                function getRandomInt(min, max) {
-                    return Math.floor(Math.random() * (max - min + 1)) + min;
-                }
+    }
 
-                // Initialize items array with random number of items between 3 and 5
-                const numItems = getRandomInt(3, 5);
-                for (let i = 0; i < numItems; i++) {
-                    const x = getRandomInt(560, 560 + mainWidth - size); // Random x-coordinate within the canvas
-                    const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
-                    items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
-                }
-					
-					
-					// Render bag grid
-					initCells();
-                    // Start the game loop
-                    setInterval(gameLoop, 33);
+});
+
+// Function to handle mouse up event
+canvas.addEventListener("mouseup", function(event) {
+    // Check if an item is being dragged
+    if (draggedItem) {
+        // Check if the item is dropped into the bag
+        if (isOverBagGrid(draggedItem)) {
+            dropItemInBag(draggedItem);
+			drawBaggedItems(draggedItem);
+        }
+        // Reset dragging flag
+        draggedItem.isDragging = false;
+        draggedItem = null;
+    }
+});
+
+// Function to handle mouse move event
+canvas.addEventListener("mousemove", function(event) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Update position of dragged item
+    if (draggedItem) {
+        draggedItem.x = mouseX - draggedItem.dragOffsetX;
+        draggedItem.y = mouseY - draggedItem.dragOffsetY;
+        draggedItem.sizeX = draggedItem.size * draggedItem.gridSizeX;
+        draggedItem.sizeY = draggedItem.size * draggedItem.gridSizeY;
+
+
+
+    }
+});
+
+
+
+// Function to render items and bag grid
+function render() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Render main window border
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(560, 240, mainWidth, mainHeight);
+    // Render bag border
+    ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
+    //render cells
+    bagCells.cells.forEach(cell => {
+
+        cell.drawCell();
+
+    });
+    // Highlight cells based on item dragging
+    if (draggedItem) {
+        highlightCellsForItem(draggedItem);
+    }
+
+
+
+    // Render items
+    items.forEach(item => {
+        ctx.fillStyle = item.color;
+        const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
+        const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
+        ctx.fillRect(item.x, item.y, item.size, item.size);
+        if (item.isDragging) {
+            // Adjusted size for dragging
+            ctx.fillStyle = item.color;
+            ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
+            // Render tooltip
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            const text = item.name;
+            const textWidth = ctx.measureText(text).width;
+            ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
+            ctx.fillStyle = "black";
+            ctx.font = "12px Arial";
+            ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
+            ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
+            ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
+
+        } else if (!item.isDragging && item.isInBag) {
+            ctx.fillStyle = item.color;
+            ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
+        } else {
+            ctx.fillStyle = item.color;
+            ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
+        } // Adjusted size for dragging
+
+
+    });
+}
+
+// Main game loop
+function gameLoop() {
+    render();
+
+}
+
+// Function to generate a random integer between min and max (inclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Initialize items array with random number of items between 3 and 5
+const numItems = getRandomInt(3, 5);
+for (let i = 0; i < numItems; i++) {
+    const x = getRandomInt(560, 560 + mainWidth - size); // Random x-coordinate within the canvas
+    const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
+    items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
+}
+
+
+// Render bag grid
+initCells();
+// Start the game loop
+setInterval(gameLoop, 33);
 
         </script>
     </body>
