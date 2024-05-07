@@ -83,18 +83,18 @@ function isOverBagGrid(item) {
 
 
 // Function to handle cell highlighting when an item is dragged
-function highlightCellsForItem(pCellPositions) {
-	cellPositions = pCellPositions;
-        for (let i = 0; i < cellPositions.length; i++) {
-			const cell = cellPositions[i];        
+function highlightCellsForItem(pCellInfos) {
+	cellInfo = pCellInfos;
+        for (let i = 0; i < cellInfo.length; i++) {
+			const cell = cellInfo[i];        
             cell.isHighlighted = true;
-            if (!cell.isOccupied) {
-                ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-            } else {
-                ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-            }
+ 		if (!cell.isOccupied) {
+			ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+				} else {
+			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+				}
 			ctx.fillRect(cell.x, cell.y, cellSize, cellSize);
        
-    }
+		}
 }
 

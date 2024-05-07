@@ -130,8 +130,8 @@ function dropItemInBag(item) {
             let cellPosX = cell.position[0];
             let cellPosY = cell.position[1];            
             // Snap the item's position to the cell
-            item.x = cell.x + 10;
-            item.y = cell.y + 10;
+            item.x = cell.x + 5;
+            item.y = cell.y + 5;
             item.isDragging = false;
             item.isInBag = true;
             cell.isOccupied = true;
