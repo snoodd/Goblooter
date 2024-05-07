@@ -48,6 +48,7 @@ function initCells() {
     }
 
 }
+
 function calculateTotalValue() {
     let totalValue = 0;
     for (const item of baggedItems) {
@@ -79,28 +80,21 @@ function isOverBagGrid(item) {
 }
 
 
-// Function to handle cell highlighting when an item is dragged
-function highlightCellsForItem(item) {
-	const startX = item.x;
-    const startY = item.y;
-    const endX = item.x + (item.size * item.gridSizeX);
-    const endY = item.y + (item.size * item.gridSizeY);
-        for (let i = 0; i < bagCells.cells.length; i++) {
-			const cell = bagCells.cells[i];
-			const cellEndX = cell.x + (item.gridSizeX * cellSize);
-			const cellEndY = cell.y + (item.gridSizeY * cellSize);
 
-        if (startX <= cellEndX && endX >= cell.x && startY <= cellEndY && endY >= cell.y) {
+
+// Function to handle cell highlighting when an item is dragged
+function highlightCellsForItem(pCellPositions) {
+	cellPositions = pCellPositions;
+        for (let i = 0; i < cellPositions.length; i++) {
+			const cell = cellPositions[i];        
             cell.isHighlighted = true;
             if (!cell.isOccupied) {
                 ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
             } else {
                 ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
             }
-
-            ctx.fillRect(cell.x, cell.y, cellSize, cellSize);
-        } else {
-            cell.isHighlighted = false;
-        }
+			ctx.fillRect(cell.x, cell.y, cellSize, cellSize);
+       
     }
 }
+

@@ -4,6 +4,88 @@ function getRandomElement(arrayToPickFrom) {
     return arrayToPickFrom[Math.floor(Math.random() * arrayToPickFrom.length)]
 }
 
+
+const itemShapes = [
+  { type: "shortThin",
+    items: [ { id: 01, name: 'dagger'},
+             { id: 02, name: 'wand'},
+             { id: 03, name: 'bracer'}],
+    shape: [[0,0],
+            [0,1]]},
+  { type: "mediumThin",
+    items: [ { id: 01, name: 'longsword'},
+             { id: 02, name: 'large axe'},
+             { id: 03, name: 'short staff'}],
+    shape: [[0,0],
+            [0,1],
+            [0,2]]},
+  { type: "longThin",
+    items: [ { id: 01, name: 'Lance'},
+             { id: 02, name: 'Longspear'},
+             { id: 03, name: 'Staff'}],
+    shape: [[0,0],
+            [0,1],
+            [0,2],
+            [0,3]]},
+   { type: "shortWide",
+    items: [ { id: 01, name: 'helm'},
+             { id: 02, name: 'small shield'},
+             { id: 03, name: 'double throwing axes'}],
+    shape: [[0,0],[1,0],
+            [0,1],[1,1]]},
+   { type: "mediumWide",
+    items: [ { id: 01, name: 'hauberk'},
+             { id: 02, name: 'legplates'},
+             { id: 03, name: 'tunic'}],
+    shape: [[0,0],[1,0],
+            [0,1],[1,1],
+            [0,2],[1,2]]},
+    { type: "longWide",
+    items: [ { id: 01, name: 'robe'},
+             { id: 02, name: 'tower shield'},
+             { id: 03, name: 'two handed axe'}],
+    shape: [[0,0],[1,0],
+            [0,1],[1,1],
+            [0,2],[1,2],
+            [0,3],[1,3]]} 
+ ];
+
+// Function to choose a random type and a random item from that type
+function chooseRandomItem() {
+  // Choose a random type
+  const selectedType = getRandomElement(itemShapes);
+  // Choose a random item from the selected type
+  const selectedItem = getRandomElement(selectedType.items);
+  // Return the name of the selected item and the shape of the selected type
+  return {
+    itemName: selectedItem.name,
+    shape: selectedType.shape
+  };
+}
+
+function getBelievableItemName() {
+    class ItemAdjective {
+    constructor(pWord, pValue) {
+        this.word = pWord;
+        this.value = pValue;
+    }
+}
+
+    const { itemName, shape } = chooseRandomItem();
+    const owners = ["Jeff", "Andrew", "Stik", "Joe", "Catherine", "Egg", "Plant"];
+    const adjectives = [
+        new ItemAdjective("Great", 3.0),
+        new ItemAdjective("Crappy", -2.0),
+        new ItemAdjective("Small", 0.9),
+        new ItemAdjective("Blue", 83)
+    ];
+    const owner = getRandomElement(owners);
+    const adjective = getRandomElement(adjectives);             
+
+    return [owner + "'s " + adjective.word + " ", itemName, adjective.value, shape[0], shape[1],shape];
+}
+
+
 // Function to create a new item
 function createItem(x, y, value) {
     const iteminfo = getBelievableItemName();
@@ -14,9 +96,10 @@ function createItem(x, y, value) {
         color: `rgb(${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, ${getRandomInt(0, 255)})`, // Random color,
         name: iteminfo[0] + iteminfo[1],
         value: value * iteminfo[2],
-        type: iteminfo[1],=8
-        gridSizeX: iteminfo[3],
-        gridSizeY: iteminfo[4],
+        type: iteminfo[1],
+        shape: iteminfo[5],
+        gridSizeX: 2,
+        gridSizeY: 3,
         isDragging: false,
         isInBag: false,
         dragOffsetX: 0,
@@ -24,6 +107,8 @@ function createItem(x, y, value) {
     };
 console.log(createItem);
 }
+
+
 
 // Function to check if an item is being dropped into the bag
 function dropItemInBag(item) {
@@ -34,15 +119,16 @@ function dropItemInBag(item) {
     
 	for (let i = 0; i < bagCells.cells.length; i++) {
         const cell = bagCells.cells[i];
-        const cellStartX = cell.x - cellSize;
-        const cellStartY = cell.y - cellSize;		
+        const cellStartX = cell.x;
+        const cellStartY = cell.y;		
         const cellEndX = cell.x + cellSize;
         const cellEndY = cell.y + cellSize;
+//          
 
 
-        // Check if the item's center falls within the cell
-        if (startX <= cellEndX && endX >= cell.x && startY <= cellEndY && endY >= cell.y &&
-            !cell.isOccupied) {
+        if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
+            let cellPosX = cell.position[0];
+            let cellPosY = cell.position[1];            
             // Snap the item's position to the cell
             item.x = cell.x + 10;
             item.y = cell.y + 10;
@@ -51,30 +137,34 @@ function dropItemInBag(item) {
             cell.isOccupied = true;
             // Add the item to the baggedItems array
             baggedItems.push(item);
+            //checkedPositions = reportCellPositions(item.shape,cellPosX,cellPosY);
             return;
-        }
+        }   
+
+
+           /* let startRow = cell.position[0],
+                startCol = cell.position[1];
+                    item.shape.forEach(([dr, dc]) => {
+                        const newRow = cell.position[1] + dr;
+                        const newCol = cell.position[0] + dc;
+                        foundRow = startRow * newRow;
+                        foundCol = startCol * newCol;
+                        console.log(`Moved to position: (${foundRow}, ${foundCol})`);
+                        startRow = newRow;
+                        startCol = newCol;
+        });*/
     }
+
 }
 
-class ItemCategory {
-    constructor(pWord, pValue) {
-        this.word = pWord;
-        this.value = pValue;
-    }
-}
 
-class Itemtype {
-    constructor(type, subType) {
-        this.type = type;
-        this.subType = subType;
-        this.value = pValue;
-    }
-}
+/*
 
 
 function getItemType() {
     let itemCategory = "";
     let itemType = "";
+    const itemShapes = ["1x1","1x2","1x3","1x4","2x2","2x3","2x4"]; 
     const things = ["Weapon", "Armor", "Accessory"];
     const thing = getRandomElement(things);
     const weaponTypes = ["Sword","Axe","Dagger","Polearm","Staff"];
@@ -92,25 +182,7 @@ function getItemType() {
     const necklace_types = ["Pendant", "Choker", "Chain", "Collar", "Torc"];
     const trinket_types = ["Charm", "Bauble", "Token", "Ornament", "Relic"];
 
-/*function assignItemShape(size){
- pItemsize = size;
-switch (pItemsize) {                
-        case '1x1':
-         shapeAssigned = [(0,0)];
-        break;
-        case '1x2':
-         shapeAssigned = [(0,0),(0,1)];
-        break;
-        case '1x3':
-         shapeAssigned = [(0,0),(0,1),(0,2)];
-        break;
-        case '1x4':
-         shapeAssigned = [(0,0),(0,1),(0,2),(0,3)];
-        break;
-default:
-    console.log(`Error`);
-}
-}*/
+
 
 const swordTypes = ["Claymore",
                     "Rapier",
@@ -251,44 +323,8 @@ function getItemShape(){
 }
 return itemType;
 
-
-
-function getBelievableItemName(pItemType) {
+function getItemShape(pItemType){
     itemType = pItemType;
-    class ItemAdjective {
-    constructor(pWord, pValue) {
-        this.word = pWord;
-        this.value = pValue;
-    }
-}
-function getItemShape(){
-    class ItemShape {
-    constructor(pType, pShape) {
-        this.type = pType;
-        this.shape = pShape;
-    }
-}
 }
 
-    const owners = ["Jeff", "Andrew", "Stik", "Joe", "Catherine", "Egg", "Plant"];
-    const 
-    const adjectives = [
-        new ItemAdjective("Great", 3.0),
-        new ItemAdjective("Crappy", -2.0),
-        new ItemAdjective("Small", 0.9),
-        new ItemAdjective("Blue", 83)
-    ];
-    const owner = getRandomElement(owners);
-    const adjective = getRandomElement(adjectives);				
-	
-  /*  // Calculate gridSizeX and gridSizeY based on the item type
-    if (thing === "Weapon" || thing === "Armor") {
-        gridSizeX = 2;
-        gridSizeY = getRandomInt(2, 4); // Random number between 2 and 4 for gridSizeY
-    } else {
-        gridSizeX = 1;
-        gridSizeY = 1;
-    }*/
-
-    return [owner + "'s " + adjective.word + " ", getItemType(), adjective.value, 2, 4];
-}
+*/

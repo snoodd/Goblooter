@@ -61,6 +61,7 @@ canvas.addEventListener("mousedown", function(event) {
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
+    console.log(mouseX, mouseY);
 
     // Check if mouse click is inside any item
     for (let i = 0; i < items.length; i++) {
@@ -87,6 +88,13 @@ canvas.addEventListener("mousedown", function(event) {
 canvas.addEventListener("mouseup", function(event) {
     // Check if an item is being dragged
     if (draggedItem) {
+        initialCell = getinitialCellPosition(draggedItem);
+        console.log("first cell " , initialCell);
+        checkedCells = reportCellPositions(draggedItem.shape,initialCell[0],initialCell[1]);
+        console.log("checked cell " , checkedCells);
+        console.log(bagCells);
+        resultingCellInfo = getCellInfo(checkedCells);
+        console.log(resultingCellInfo);
         // Check if the item is dropped into the bag
         if (isOverBagGrid(draggedItem)) {
             dropItemInBag(draggedItem);
@@ -115,8 +123,40 @@ canvas.addEventListener("mousemove", function(event) {
 
     }
 });
+function getinitialCellPosition(item) {
+    
+    for (let i = 0; i < bagCells.cells.length; i++) {
+        const cell = bagCells.cells[i];
 
+        if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
+            let cellPosX = cell.position[0];
+            let cellPosY = cell.position[1];            
+            return [cellPosX, cellPosY];
+        }
+        }   
+}
+function reportCellPositions(shape, startX, startY) {
+    const positions = [];
+    let currentX = startX,
+        currentY = startY;
 
+    shape.forEach(([dx, dy]) => {
+        let newX = currentX + dx;
+        let newY = currentY + dy;
+        positions.push([newX, newY]);
+        
+    });
+    return positions;
+}
+function getCellInfo(pReportedCells){
+
+    result = bagCells.cells.filter(cell => {
+        return pReportedCells.some(entry => {
+                return entry[0] === cell.position[0] && entry[1] === cell.position[1];
+        });
+    });
+    return result;
+}
 
 // Function to render items and bag grid
 function render() {
