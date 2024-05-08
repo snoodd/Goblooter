@@ -35,7 +35,7 @@ function initCells() {
         for (let j = 0; j < columns; j++) {
             numbers[i][j] = j + 1 + (i * columns);
             let newC = new cell([i,j], bagXpos + bagPadding + (j * cellSize), bagYpos + bagPadding + (i * cellSize));
-			console.log(newC);
+			//console.log(newC);
             if ((i + j) % 2 === 0) {
                 newC.color = "rgba(255, 255, 255, 0.5)";
             } else {
@@ -43,7 +43,7 @@ function initCells() {
             }
             index++
             bagCells.cells.push(newC);
-
+console.log(newC);
         }
     }
 
@@ -73,9 +73,10 @@ function drawBaggedItems(item) {
 function isOverBagGrid(item) {
     return (
         item.x >= bagXpos &&
-        item.x + item.size <= bagXpos + bagWidth &&
+        item.x + cellSize <= bagXpos + bagWidth &&
         item.y >= bagYpos &&
-        item.y + item.size <= bagYpos + bagHeight
+        item.y + cellSize <= bagYpos + bagHeight
+
     );
 }
 
@@ -83,18 +84,53 @@ function isOverBagGrid(item) {
 
 
 // Function to handle cell highlighting when an item is dragged
-function highlightCellsForItem(pCellInfos) {
+function highlightCells(pCellInfos) {
 	cellInfo = pCellInfos;
         for (let i = 0; i < cellInfo.length; i++) {
 			const cell = cellInfo[i];        
-            cell.isHighlighted = true;
- 		if (!cell.isOccupied) {
-			ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-				} else {
-			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-				}
-			ctx.fillRect(cell.x, cell.y, cellSize, cellSize);
-       
+            if (!cell.isOccupied) {
+                ctx.fillStyle = "rgba(0, 0, 255, 0.25)";
+            } else {
+                ctx.fillStyle = "rgba(255, 0, 0, 0.25)";
+            }
+                ctx.fillRect(cell.x, cell.y, cellSize, cellSize);	
 		}
 }
 
+function getinitialCellPosition(item) {
+    let cellPosX = 0;
+    let cellPosY = 0;
+    for (let i = 0; i < bagCells.cells.length; i++) {
+        const cell = bagCells.cells[i];
+
+        if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
+
+            cellPosX = cell.position[1];
+            cellPosY = cell.position[0];
+            return [cellPosX, cellPosY];
+        }
+        }   
+
+}
+function reportCellPositions(shape, startX, startY) {
+    const positions = [];
+    let currentX = startX,
+        currentY = startY;
+
+    shape.forEach(([dx, dy]) => {
+        let newX = currentX + dx;
+        let newY = currentY + dy;
+        positions.push([newY, newX]);
+        
+    });
+    return positions;
+}
+function getCellInfo(pReportedCells){
+
+    result = bagCells.cells.filter(cell => {
+        return pReportedCells.some(entry => {
+                return entry[0] === cell.position[0] && entry[1] === cell.position[1];
+        });
+    });
+    return result;
+}

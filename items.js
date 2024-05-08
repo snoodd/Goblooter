@@ -105,7 +105,7 @@ function createItem(x, y, value) {
         dragOffsetX: 0,
         dragOffsetY: 0
     };
-console.log(createItem);
+//console.log(createItem);
 }
 
 

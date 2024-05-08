@@ -34,34 +34,33 @@ const bagPadding = 10;
 // Bag dimensions and position
 const bagXpos = 50;
 const bagYpos = 240;
-const bagWidth = 320;
-const bagHeight = 600;
+const bagWidth = 450;
+const bagHeight = 700;
 let mainWidth = 800;
 let mainHeight = 600;
 
 // Array to store items
 const items = [];
 const baggedItems = [];
-let draggedItem = null;
+let draggedItem;
 // Array to store cells in the bag grid
 const bagGrid = [];
 let numColumns = 8;
 let numRows = 10;
-
-
 const numbers = [];
 const columns = 8;
 const rows = 10;
 let bagCells = new cellsContainer;
-
-
+let initialCell;
+let checkedCells;
+let highlightedCells;
 
 // Function to handle mouse down event
 canvas.addEventListener("mousedown", function(event) {
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
-    console.log(mouseX, mouseY);
+   // console.log(mouseX, mouseY);
 
     // Check if mouse click is inside any item
     for (let i = 0; i < items.length; i++) {
@@ -80,21 +79,24 @@ canvas.addEventListener("mousedown", function(event) {
         }
     }
 
+
 });
 
 // Function to handle mouse up event
 canvas.addEventListener("mouseup", function(event) {
     // Check if an item is being dragged
     if (draggedItem) {
-        if (isOverBagGrid(draggedItem)) {
+        if (isOverBagGrid(draggedItem)) {    
             dropItemInBag(draggedItem);
 			drawBaggedItems(draggedItem);	
 			
-        }
+        } else {
         // Reset dragging flag
         draggedItem.isDragging = false;
         draggedItem = null;
-    }         
+ } 
+
+}
 });
 
 // Function to handle mouse move event
@@ -109,47 +111,18 @@ canvas.addEventListener("mousemove", function(event) {
         draggedItem.y = mouseY - draggedItem.dragOffsetY;
         draggedItem.sizeX = draggedItem.size * draggedItem.gridSizeX;
         draggedItem.sizeY = draggedItem.size * draggedItem.gridSizeY;
-
+                if (draggedItem && isOverBagGrid(draggedItem)) {
+            initialCell = getinitialCellPosition(draggedItem);
+            checkedCells = reportCellPositions(draggedItem.shape,initialCell[0],initialCell[1]);
+            resultingCellInfo = getCellInfo(checkedCells);
+            highlightedCells = getCellInfo(checkedCells);
+            highlightCells(highlightedCells);
+        }
+ 
 
     }
 });
-function getinitialCellPosition(item) {
-	let cellPosX = 0;
-	let cellPosY = 0;
-    for (let i = 0; i < bagCells.cells.length; i++) {
-        const cell = bagCells.cells[i];
 
-        if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
-
-			cellPosX = cell.position[1];
-			cellPosY = cell.position[0];
-            return [cellPosX, cellPosY];
-        }
-        }   
-
-}
-function reportCellPositions(shape, startX, startY) {
-    const positions = [];
-    let currentX = startX,
-        currentY = startY;
-
-    shape.forEach(([dx, dy]) => {
-        let newX = currentX + dx;
-        let newY = currentY + dy;
-        positions.push([newX, newY]);
-        
-    });
-    return positions;
-}
-function getCellInfo(pReportedCells){
-
-    result = bagCells.cells.filter(cell => {
-        return pReportedCells.some(entry => {
-                return entry[0] === cell.position[1] && entry[1] === cell.position[0];
-        });
-    });
-    return result;
-}
 
 // Function to render items and bag grid
 function render() {
@@ -168,27 +141,16 @@ function render() {
 
 
     });
-    // Highlight cells based on item dragging
-    if (!draggedItem) {
-		
-} else {
-		initialCell = getinitialCellPosition(draggedItem);
-		console.log("initial cell " + initialCell);
-		checkedCells = reportCellPositions(draggedItem.shape,initialCell[0],initialCell[1]);
-		console.log("initial cell " + checkedCells);
-		resultingCellInfos = getCellInfo(checkedCells);
-		
-		resultingCellInfos.forEach(cell => {
-        highlightCellsForItem(resultingCellInfos);
-		});
-}
-    // Render items
+        // Render items
     items.forEach(item => {
         ctx.fillStyle = item.color;
         const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
         const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
         ctx.fillRect(item.x, item.y, item.size, item.size);
-        if (item.isDragging) {
+        if (!item.isDragging) {
+            ctx.fillStyle = item.color;
+            ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
+        } else if (item.isDragging) {
             // Adjusted size for dragging
             ctx.fillStyle = item.color;
             ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
@@ -202,22 +164,23 @@ function render() {
             ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
             ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
             ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
-
         } else if (!item.isDragging && item.isInBag) {
             ctx.fillStyle = item.color;
             ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
-        } else {
-            ctx.fillStyle = item.color;
-            ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
-        } // Adjusted size for dragging
+            console.log("2");
+        } 
 
 
     });
-
+    
 }
+
+
+
 // Main game loop
 function gameLoop() {
     render();
+
 
 }
 
