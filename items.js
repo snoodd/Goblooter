@@ -61,6 +61,18 @@ function chooseRandomItem() {
     itemName: selectedItem.name,
     shape: selectedType.shape
   };
+  console.log("randomly selected item: " ,itemName,shape);
+}
+
+function calculateDimensions(pShape) {
+	let shape = pShape;
+    const lastPair = shape[shape.length - 1];
+    if (!lastPair || lastPair.length !== 2) {
+        return { width: 0, height: 0 }; // Return 0 for width and height if the last pair is missing or invalid
+    }
+
+    const [lastX, lastY] = lastPair;
+    return { width: lastX + 1, height: lastY + 1 };
 }
 
 function getBelievableItemName() {
@@ -71,7 +83,11 @@ function getBelievableItemName() {
     }
 }
 
+
+
     const { itemName, shape } = chooseRandomItem();
+	const dimensions = calculateDimensions(shape);
+	console.log(itemName, dimensions);
     const owners = ["Jeff", "Andrew", "Stik", "Joe", "Catherine", "Egg", "Plant"];
     const adjectives = [
         new ItemAdjective("Great", 3.0),
@@ -82,12 +98,14 @@ function getBelievableItemName() {
     const owner = getRandomElement(owners);
     const adjective = getRandomElement(adjectives);             
 
-    return [owner + "'s " + adjective.word + " ", itemName, adjective.value, shape[0], shape[1],shape];
+    return [owner + "'s " + adjective.word + " ", itemName, adjective.value, dimensions.width, dimensions.height,shape];
 }
+
 
 
 // Function to create a new item
 function createItem(x, y, value) {
+
     const iteminfo = getBelievableItemName();
     return {
         x: x,
@@ -98,14 +116,14 @@ function createItem(x, y, value) {
         value: value * iteminfo[2],
         type: iteminfo[1],
         shape: iteminfo[5],
-        gridSizeX: 2,
-        gridSizeY: 3,
+        gridSizeX: iteminfo[3],
+        gridSizeY: iteminfo[4],
         isDragging: false,
         isInBag: false,
         dragOffsetX: 0,
         dragOffsetY: 0
     };
-//console.log(createItem);
+console.log(createItem);
 }
 
 
@@ -118,12 +136,10 @@ function dropItemInBag(item) {
     const endY = item.y + (item.size * item.gridSizeY);
     
 	for (let i = 0; i < bagCells.cells.length; i++) {
-        const cell = bagCells.cells[i];
-        const cellStartX = cell.x;
-        const cellStartY = cell.y;		
+        const cell = bagCells.cells[i];	
         const cellEndX = cell.x + cellSize;
         const cellEndY = cell.y + cellSize;
-//          
+        
 
 
         if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
@@ -138,21 +154,12 @@ function dropItemInBag(item) {
             // Add the item to the baggedItems array
             baggedItems.push(item);
             //checkedPositions = reportCellPositions(item.shape,cellPosX,cellPosY);
+			console.log(baggedItems);
             return;
         }   
 
 
-           /* let startRow = cell.position[0],
-                startCol = cell.position[1];
-                    item.shape.forEach(([dr, dc]) => {
-                        const newRow = cell.position[1] + dr;
-                        const newCol = cell.position[0] + dc;
-                        foundRow = startRow * newRow;
-                        foundCol = startCol * newCol;
-                        console.log(`Moved to position: (${foundRow}, ${foundCol})`);
-                        startRow = newRow;
-                        startCol = newCol;
-        });*/
+
     }
 
 }
