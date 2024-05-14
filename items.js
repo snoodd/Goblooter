@@ -130,41 +130,41 @@ console.log(createItem);
 
 // Function to check if an item is being dropped into the bag
 function dropItemInBag(item) {
-	const startX = item.x;
-    const startY = item.y;
-    const endX = item.x + (item.size * item.gridSizeX);
-    const endY = item.y + (item.size * item.gridSizeY);
-    
-	for (let i = 0; i < bagCells.cells.length; i++) {
-        const cell = bagCells.cells[i];	
-        const cellEndX = cell.x + cellSize;
-        const cellEndY = cell.y + cellSize;
-        
+	let cellInfo = getCellInfo(item);
+	let unoccupiedCellCount = 0;
+	// Count the number of unoccupied cells in cellInfo
+	const unoccupiedCells = cellInfo.filter(cell => !cell.isOccupied);
 
 
-        if (item.x >= cell.x  && item.x < cell.x + cellSize  && item.y >= cell.y && item.y < cell.y + cellSize) {
-            let cellPosX = cell.position[0];
-            let cellPosY = cell.position[1];            
-            // Snap the item's position to the cell
-            item.x = cell.x + 5;
-            item.y = cell.y + 5;
-            item.isDragging = false;
-            item.isInBag = true;
+
+// Check if the number of unoccupied cells matches the number of cells required by the item's shape
+    if (unoccupiedCells.length === item.shape.length) {
+        // Snap the item's position to the cell
+        item.x = unoccupiedCells[0].x + 5;
+        item.y = unoccupiedCells[0].y + 5;
+        item.isDragging = false;
+        item.isInBag = true;
+
+        // Mark the cells as occupied
+        unoccupiedCells.forEach(cell => {
             cell.isOccupied = true;
-            // Add the item to the baggedItems array
-            baggedItems.push(item);
-            //checkedPositions = reportCellPositions(item.shape,cellPosX,cellPosY);
-			console.log(baggedItems);
-            return;
-        }   
-
-
-
-    }
-
+			cell.occupyingItem = item;
+        });
+		console.log(unoccupiedCells);
+        // Add the item to the baggedItems array
+        baggedItems.push(item);
+        console.log(baggedItems);
+    } else {
+		item.isDragging = false;
+		item.isInBag = false;
+		baggedItems.pop(item);
+        // If the item cannot fit in the bag, reset its position
+        item.x = getRandomInt(560, 560 + mainWidth - size);
+        item.y = getRandomInt(240, 240 + mainHeight - size);
+    
 }
 
-
+}
 /*
 
 

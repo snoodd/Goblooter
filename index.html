@@ -86,13 +86,15 @@ canvas.addEventListener("mousedown", function(event) {
 canvas.addEventListener("mouseup", function(event) {
     // Check if an item is being dragged
     if (draggedItem) {
-        if (isOverBagGrid(draggedItem)) {    
-            dropItemInBag(draggedItem);	
+       if (isOverBagGrid(draggedItem)) {   
+		dropItemInBag(draggedItem);	   
         // Reset dragging flag
         draggedItem.isDragging = false;
         draggedItem = null;
  } else if (!isOverBagGrid(draggedItem)) {
-	baggedItems.pop(draggedItem);
+        draggedItem.isDragging = false;
+        draggedItem = null;
+		baggedItems.pop(draggedItem);
 }
 }
 });

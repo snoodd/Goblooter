@@ -9,6 +9,7 @@ class cell {
         this.isOccupied = false;
         this.isHighlighted = false;
         this.color = "";
+		this.occupyingItem;
 
     }
     drawCell() {
