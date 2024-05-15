@@ -75,6 +75,13 @@ function calculateDimensions(pShape) {
     return { width: lastX + 1, height: lastY + 1 };
 }
 
+function reverseShape(item) {
+    item.shape = item.shape.map(([x, y]) => [y, x]);
+    // Update the item's gridSizeX and gridSizeY to reflect the reversed shape
+    [item.gridSizeX, item.gridSizeY] = [item.gridSizeY, item.gridSizeX];
+}
+
+
 function getBelievableItemName() {
     class ItemAdjective {
     constructor(pWord, pValue) {
@@ -157,7 +164,6 @@ function dropItemInBag(item) {
     } else {
 		item.isDragging = false;
 		item.isInBag = false;
-		baggedItems.pop(item);
         // If the item cannot fit in the bag, reset its position
         item.x = getRandomInt(560, 560 + mainWidth - size);
         item.y = getRandomInt(240, 240 + mainHeight - size);

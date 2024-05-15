@@ -25,7 +25,7 @@
 		<script src="bagFunctions.js"></script>
 		<script src="items.js"></script>
 		<script>
-                    const canvas = document.getElementById("gameCanvas");
+const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const cellSize = 50;
 const size = 50;
@@ -44,9 +44,6 @@ const items = [];
 const baggedItems = [];
 let draggedItem;
 // Array to store cells in the bag grid
-const bagGrid = [];
-let numColumns = 8;
-let numRows = 10;
 const numbers = [];
 const columns = 8;
 const rows = 10;
@@ -67,6 +64,9 @@ canvas.addEventListener("mousedown", function(event) {
         const item = items[i];
         if (mouseX >= item.x && mouseX <= item.x + item.size &&
             mouseY >= item.y && mouseY <= item.y + item.size) {
+			if (item.isInBag) {
+                clearOccupiedCells(item);
+            }
             // Set dragging flag and save offset
             item.isDragging = true;
             item.dragOffsetX = mouseX - item.x;
@@ -82,6 +82,14 @@ canvas.addEventListener("mousedown", function(event) {
 
 });
 
+document.addEventListener("keydown", event => {
+    if (event.code === "Space" && draggedItem) {
+        reverseShape(draggedItem);
+    }
+});
+
+
+
 // Function to handle mouse up event
 canvas.addEventListener("mouseup", function(event) {
     // Check if an item is being dragged
@@ -94,7 +102,6 @@ canvas.addEventListener("mouseup", function(event) {
  } else if (!isOverBagGrid(draggedItem)) {
         draggedItem.isDragging = false;
         draggedItem = null;
-		baggedItems.pop(draggedItem);
 }
 }
 });
@@ -127,7 +134,7 @@ function render() {
     ctx.strokeStyle = "white";
     ctx.strokeRect(560, 240, mainWidth, mainHeight);
     // Render bag border
-    ctx.strokeRect(bagXpos, bagYpos, numColumns * cellSize + 2 * bagPadding, numRows * cellSize + 2 * bagPadding);
+    ctx.strokeRect(bagXpos, bagYpos, columns * cellSize + 2 * bagPadding, rows * cellSize + 2 * bagPadding);
     //render cells
     bagCells.cells.forEach(cell => {
 
@@ -147,8 +154,6 @@ function render() {
         // Render items
     items.forEach(item => {
         ctx.fillStyle = item.color;
-        const itemSizeX = draggedItem && draggedItem === item ? item.size * item.gridSizeX : item.size;
-        const itemSizeY = draggedItem && draggedItem === item ? item.size * item.gridSizeY : item.size;
         ctx.fillRect(item.x, item.y, item.size, item.size);
         if (!item.isDragging && !item.IsInBag) {
             ctx.fillStyle = item.color;
@@ -161,7 +166,7 @@ function render() {
             ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
             const text = item.name;
             const textWidth = ctx.measureText(text).width;
-            ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth + 15, 50);
+            ctx.fillRect(item.x + item.size + 10, item.y - 30, textWidth, 50);
             ctx.fillStyle = "black";
             ctx.font = "12px Arial";
             ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);

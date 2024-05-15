@@ -139,3 +139,17 @@ function getCellInfo(item){
     });
     return result;
 }
+
+function clearOccupiedCells(item) {
+    cellsInfo = getCellInfo(item);
+    cellsInfo.forEach(cell => {
+        cell.isOccupied = false;
+        cell.occupyingItem = null;
+    });
+    item.isInBag = false;
+    // Remove item from baggedItems array
+    const index = baggedItems.indexOf(item);
+    if (index > -1) {
+        baggedItems.splice(index, 1);
+    }
+}
