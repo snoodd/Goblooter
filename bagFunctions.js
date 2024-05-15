@@ -76,9 +76,9 @@ if(baggedItemsToBeDrawn.length >= 1){
 function isOverBagGrid(item) {
     return (
         item.x >= bagXpos &&
-        item.x + cellSize <= bagXpos + bagWidth &&
+        item.x + cellSize <= bagXpos + (cellSize * (columns + 1)) &&
         item.y >= bagYpos &&
-        item.y + cellSize <= bagYpos + bagHeight
+        item.y + cellSize <= bagYpos + (cellSize * (rows + 1))
 
     );
 }

@@ -109,6 +109,22 @@ function getBelievableItemName() {
 }
 
 
+// Function to generate a random integer between min and max (inclusive)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Function to generate items
+function generateItems() {
+    if (gameStarted) {
+        const numItems = getRandomInt(3, 5);
+        for (let i = 0; i < numItems; i++) {
+            const x = getRandomInt(560, 560 + mainWidth - size); // Random x-coordinate within the canvas
+            const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
+            items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
+        }
+    }
+}
 
 // Function to create a new item
 function createItem(x, y, value) {

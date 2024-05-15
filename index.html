@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Combat-less ARPG</title>
+        <title>Goblooter</title>
         <style>
             body {
                 margin: 0;
@@ -17,14 +17,28 @@
                 border: 1px solid #ccc;
                 background-color: #000000;
             }
+			#gameCanvas {
+				display: none; /* Initially hide the game canvas */
+        }
+			#titleScreen {
+				display: block; /* Initially hide the game canvas */
+        }
+			#startButton {
+				display: block; /* Initially hide the game canvas */
+        }
         </style>
     </head>
     <body>
         <canvas id="gameCanvas" width="1920" height="1080"></canvas>
-
 		<script src="bagFunctions.js"></script>
 		<script src="items.js"></script>
+		    <div id="titleScreen">
+				<h1>Goblooter</h1>
+				<button id="startButton">Start</button>
+			</div>
 		<script>
+const titleScreen = document.getElementById("titleScreen");
+const startButton = document.getElementById("startButton");
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const cellSize = 50;
@@ -51,6 +65,39 @@ let bagCells = new cellsContainer;
 let initialCell;
 let checkedCells;
 let highlightedCells;
+let gameStarted = false; // Flag to track if the game has started
+let timer; 
+let timeLeft = 120;
+
+function gameOver() {
+  cancelInterval(timer);
+  $('#startButton').show();
+}
+
+
+startButton.addEventListener("click", startGame);
+
+	function updateTimer() {
+	  timeLeft = timeLeft - 1;
+	  if(timeLeft >= 0)
+		$('#timer').html(timeLeft);
+	  else {
+		gameOver();
+	  }
+	}
+		// Function to start the game
+function startGame() {
+
+		gameCanvas.style.display = "block";
+		// Start the timer for two minutes
+		timer = setInterval(updateTimer, 1000);
+
+		titleScreen.style.display = "none";
+		gameStarted = true;
+}
+
+
+
 
 // Function to handle mouse down event
 canvas.addEventListener("mousedown", function(event) {
@@ -150,18 +197,20 @@ function render() {
     ctx.font = "20px Arial";
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
     ctx.fillText("Total value:  " + calculateTotalValue(), bagXpos, bagYpos - 10);
-	
+	timeLeftSeconds = Math.ceil(timer / 1000); // Convert milliseconds to seconds and round up
+    ctx.fillText("Time Left: " + timeLeftSeconds + " seconds", bagXpos, bagYpos + (cellSize * (rows + 1)));
+
         // Render items
     items.forEach(item => {
         ctx.fillStyle = item.color;
-        ctx.fillRect(item.x, item.y, item.size, item.size);
+       // ctx.fillRect(item.x, item.y, item.size, item.size);
         if (!item.isDragging && !item.IsInBag) {
             ctx.fillStyle = item.color;
             ctx.fillRect(item.x, item.y, item.size, item.size); // Original size
         } else if (item.isDragging || item.IsInBag) {
             // Adjusted size for dragging
             ctx.fillStyle = item.color;
-            ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
+            ctx.fillRect(item.x, item.y, (item.size * 2) * item.gridSizeX, (item.size * 2) * item.gridSizeY);
             // Render tooltip
             ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
             const text = item.name;
@@ -189,28 +238,18 @@ function render() {
 // Main game loop
 function gameLoop() {
     render();
-
+// Start generating items every 5 seconds
+    setInterval(generateItems, 5000);
+	updateTimer();
 
 }
 
-// Function to generate a random integer between min and max (inclusive)
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Initialize items array with random number of items between 3 and 5
-const numItems = getRandomInt(3, 5);
-for (let i = 0; i < numItems; i++) {
-    const x = getRandomInt(560, 560 + mainWidth - size); // Random x-coordinate within the canvas
-    const y = getRandomInt(240, 240 + mainHeight - size); // Random y-coordinate within the canvas
-    items.push(createItem(x, y, getRandomInt(1, 100))); // Create and add item to the array
-}
 
 
 // Render bag grid
 initCells();
 // Start the game loop
-setInterval(gameLoop, 33);
+setInterval(gameLoop, 1000);
 
         </script>
     </body>
