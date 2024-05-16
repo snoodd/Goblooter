@@ -75,10 +75,10 @@ if(baggedItemsToBeDrawn.length >= 1){
 // Function to check if item is over the bag grid
 function isOverBagGrid(item) {
     return (
-        item.x >= bagXpos &&
-        item.x + cellSize <= bagXpos + (cellSize * (columns + 1)) &&
-        item.y >= bagYpos &&
-        item.y + cellSize <= bagYpos + (cellSize * (rows + 1))
+        item.x >= (bagXpos + bagPadding) &&
+        item.x + cellSize < (bagXpos + bagPadding) + (cellSize * (columns + 1)) &&
+        item.y >= (bagYpos + bagPadding) &&
+        item.y + cellSize < (bagYpos + bagPadding) + (cellSize * (rows +1))
 
     );
 }
