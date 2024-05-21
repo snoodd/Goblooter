@@ -55,6 +55,14 @@ const titleScreen = document.getElementById("titleScreen");
 const startButton = document.getElementById("startButton");
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+// Button coordinates
+const buttonX = gameCanvas.width / 2 - 75;
+const buttonY = gameCanvas.height / 2 + 60;
+const buttonWidth = 150;
+const buttonHeight = 50;
+
+
 const cellSize = 50;
 const size = 50;
 const bagPadding = 10;
@@ -80,22 +88,19 @@ let initialCell;
 let checkedCells;
 let highlightedCells;
 let gameStarted = false; // Flag to track if the game has started
-let startTime = Date.now();
-let elapsedTime = 0;
+let timer; // Variable to hold the countdown timer
+let timeLeft = 125; // Time left in seconds (2 minutes)
+let intervalId; // Variable to hold the interval ID for the item generation
+let countdownIntervalId; // Variable to hold the interval ID for the countdown
+let flashColor = "red"; // Variable to alternate flashing colors
+let flashIntervalId; // Variable to hold the interval ID for flashing text
 
-function gameOver() {
-  cancelInterval(timer);
-  $('#startButton').show();
-}
 
-
+// Add event listener to start button
 startButton.addEventListener("click", startGame);
 
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-}
+
+
 
 		// Function to start the game
 	function startGame() {
@@ -103,16 +108,71 @@ function formatTime(seconds) {
 		initCells();
 		// Start the game loop
 		setInterval(gameLoop, 60);
-	    setInterval(generateItems, 5000);
 		gameCanvas.style.display = "block";
-		titleScreen.style.display = "none";
+		startButton.style.display = "none"; // Hide the start button
+
+		// Reset the game state
+		resetGameState();
+
+		// Start the countdown timer
+		countdownIntervalId = setInterval(updateTimer, 1000);
+
+		// Start generating items every 5 seconds
+		intervalId = setInterval(generateItems, 5000);
 		gameStarted = true;
-		    // Render game timer
-		elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-		ctx.fillText(`Time: ${formatTime(elapsedTime)}`, 50, 180);
+
+		// Initial item generation
+		generateItems();
+	}
+function updateTimer() {
+    timeLeft -= 1; // Decrease time left by 1 second
+    if (timeLeft <= 0) {
+        stopGame();
+    }
 }
 
+// Function to stop the game
+function stopGame() {
+		gameStarted = false;
+    clearInterval(intervalId); // Clear the item generation interval
+    clearInterval(countdownIntervalId); // Clear the countdown timer interval
+    clearInterval(flashIntervalId); // Clear the flash interval
+		    // Dim the canvas and display "Game Over" and total value
+		ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+		ctx.fillStyle = "rgba(255, 255, 255, 1)";
+		ctx.font = "48px Arial";
+		ctx.textAlign = "center";
+		ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+
+
+    // Display the total value and make it flash
+    flashTotalValue();
+
+
+}
+// Function to flash the total value text
+function flashTotalValue() {
+   flashIntervalId = setInterval(() => {
+        flashColor = (flashColor === "red") ? "blue" : "red";
+        ctx.fillStyle = flashColor;
+        ctx.font = "36px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(`You earned: $${calculateTotalValue()}`, canvas.width / 2, canvas.height / 2 + 40);
+    }, 50); // Flash every 500 milliseconds
+}
+
+// Function to reset the game state
+function resetGameState() {
+	timeLeft = 125; // Reset time left to 2 minutes
+    items.length = 0; // Clear items array
+    baggedItems.length = 0; // Clear bagged items array
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear the flash interval if it's running
+
+}
 
 
 // Function to handle mouse down event
@@ -215,6 +275,8 @@ function render() {
     ctx.font = "20px Arial";
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
     ctx.fillText("Total value:  " + calculateTotalValue(), bagXpos, bagYpos - 10);
+// Convert timer to seconds and display
+    ctx.fillText(`Time Left: ${timeLeft} seconds`, bagXpos, bagYpos + (cellSize * (rows + 1)));
 
 
         // Render items
@@ -246,12 +308,23 @@ function render() {
     
 }
 
+// Function to draw a button on the canvas
+function drawButton(text) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+    ctx.fillStyle = "black";
+    ctx.font = "24px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(text, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2 + 8);
+}
+
 
 
 // Main game loop
 function gameLoop() {
-    render();
-
+        if (gameStarted) {
+        render();
+    }
 }
 
 
