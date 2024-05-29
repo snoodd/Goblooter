@@ -5,45 +5,31 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Goblooter</title>
         <style>
-		body {
-			margin: 0;
-			padding: 0;
-			overflow: hidden;
-			background-color: #000000;
-			background-image: url('assets/images/frame.png');
-			background-size: cover; /* This makes the background image cover the entire background */
-			background-repeat: no-repeat; /* This prevents the background image from repeating */
-			background-position: center; /* This centers the background image */
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-			flex-direction: column;
-		}
-		canvas {
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background-color: #000000;
+            }
+            canvas {
                 display: block;
                 margin: auto;
                 border: 1px solid #ccc;
                 background-color: #000000;
-		}
-		#gameCanvas {
+            }
+			#gameCanvas {
 				display: none; /* Initially hide the game canvas */
-
         }
-		#titleScreen {
-				display: block; /* Initially hide the game canvas */
+			#titleScreen {
+				display: block; 
         }
-		#startButton {
-				display: block; /* Initially hide the game canvas */
-				width: 300px;
-				height: 150px;
-				font-size: 24px;
-				cursor: pointer;
+			#startButton {
+				display: block; 
         }
         </style>
     </head>
     <body>
-        <canvas id="gameCanvas" width="1670" height="880"></canvas>
+        <canvas id="gameCanvas" width="1920" height="1080"></canvas>
 		<script src="bagFunctions.js"></script>
 		<script src="items.js"></script>
 		    <div id="titleScreen">
@@ -51,18 +37,12 @@
 				<button id="startButton">Start</button>
 			</div>
 		<script>
+
+
 const titleScreen = document.getElementById("titleScreen");
 const startButton = document.getElementById("startButton");
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
-// Button coordinates
-const buttonX = gameCanvas.width / 2 - 75;
-const buttonY = gameCanvas.height / 2 + 60;
-const buttonWidth = 150;
-const buttonHeight = 50;
-
-
 const cellSize = 50;
 const size = 50;
 const bagPadding = 10;
@@ -88,91 +68,39 @@ let initialCell;
 let checkedCells;
 let highlightedCells;
 let gameStarted = false; // Flag to track if the game has started
-let timer; // Variable to hold the countdown timer
-let timeLeft = 125; // Time left in seconds (2 minutes)
-let intervalId; // Variable to hold the interval ID for the item generation
-let countdownIntervalId; // Variable to hold the interval ID for the countdown
-let flashColor = "red"; // Variable to alternate flashing colors
-let flashIntervalId; // Variable to hold the interval ID for flashing text
+let timer; 
+let timeLeft = 120;
+
+function gameOver() {
+  cancelInterval(timer);
+  $('#startButton').show();
+}
 
 
-// Add event listener to start button
 startButton.addEventListener("click", startGame);
 
-
-
-
-		// Function to start the game
-	function startGame() {
-		// Render bag grid
-		initCells();
-		// Start the game loop
-		setInterval(gameLoop, 60);
-		gameCanvas.style.display = "block";
-		startButton.style.display = "none"; // Hide the start button
-
-		// Reset the game state
-		resetGameState();
-
-		// Start the countdown timer
-		countdownIntervalId = setInterval(updateTimer, 1000);
-
-		// Start generating items every 5 seconds
-		intervalId = setInterval(generateItems, 5000);
-		gameStarted = true;
-
-		// Initial item generation
-		generateItems();
-	}
 function updateTimer() {
     timeLeft -= 1; // Decrease time left by 1 second
     if (timeLeft <= 0) {
-        stopGame();
+        gameOver();
     }
 }
-
-// Function to stop the game
-function stopGame() {
-		gameStarted = false;
-    clearInterval(intervalId); // Clear the item generation interval
-    clearInterval(countdownIntervalId); // Clear the countdown timer interval
-    clearInterval(flashIntervalId); // Clear the flash interval
-		    // Dim the canvas and display "Game Over" and total value
-		ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-		ctx.fillStyle = "rgba(255, 255, 255, 1)";
-		ctx.font = "48px Arial";
-		ctx.textAlign = "center";
-		ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
-
-
-    // Display the total value and make it flash
-    flashTotalValue();
-
-
-}
-// Function to flash the total value text
-function flashTotalValue() {
-   flashIntervalId = setInterval(() => {
-        flashColor = (flashColor === "red") ? "blue" : "red";
-        ctx.fillStyle = flashColor;
-        ctx.font = "36px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(`You earned: $${calculateTotalValue()}`, canvas.width / 2, canvas.height / 2 + 40);
-    }, 50); // Flash every 500 milliseconds
+		// Function to start the game
+function startGame() {
+	gameCanvas.style.display = "block";
+	// Start the timer for two minutes
+	timer = setInterval(updateTimer, 1000);
+	titleScreen.style.display = "none";
+	gameStarted = true;
+    // Render bag grid
+    initCells();
+    generateItems();
+    // Start the game loop
+    setInterval(render, 33);
+    setInterval(generateItems, 5000);
 }
 
-// Function to reset the game state
-function resetGameState() {
-	timeLeft = 125; // Reset time left to 2 minutes
-    items.length = 0; // Clear items array
-    baggedItems.length = 0; // Clear bagged items array
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Clear the flash interval if it's running
 
-}
 
 
 // Function to handle mouse down event
@@ -180,13 +108,13 @@ canvas.addEventListener("mousedown", function(event) {
     const rect = canvas.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
     const mouseY = event.clientY - rect.top;
-   console.log(mouseX, mouseY);
+   // console.log(mouseX, mouseY);
 
     // Check if mouse click is inside any item
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if ((mouseX >= item.x && mouseX <= item.x + item.size &&
-            mouseY >= item.y && mouseY <= item.y + item.size)) {
+        if (mouseX >= item.x && mouseX <= item.x + item.size &&
+            mouseY >= item.y && mouseY <= item.y + item.size) {
 			if (item.isInBag) {
                 clearOccupiedCells(item);
             }
@@ -196,7 +124,7 @@ canvas.addEventListener("mousedown", function(event) {
             item.dragOffsetY = mouseY - item.y;
             // Set the dragged item
             draggedItem = item;
-
+            console.log(draggedItem);
 			
             break;
         }
@@ -220,10 +148,8 @@ canvas.addEventListener("mouseup", function(event) {
        if (isOverBagGrid(draggedItem)) {   
 		dropItemInBag(draggedItem);	   
         // Reset dragging flag
-		console.log("itemPos: ", draggedItem.x, draggedItem.y);
-		draggedItem.isDragging = false;
+        draggedItem.isDragging = false;
         draggedItem = null;
-		
  } else if (!isOverBagGrid(draggedItem)) {
         draggedItem.isDragging = false;
         draggedItem = null;
@@ -275,9 +201,7 @@ function render() {
     ctx.font = "20px Arial";
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
     ctx.fillText("Total value:  " + calculateTotalValue(), bagXpos, bagYpos - 10);
-// Convert timer to seconds and display
-    ctx.fillText(`Time Left: ${timeLeft} seconds`, bagXpos, bagYpos + (cellSize * (rows + 1)));
-
+	ctx.fillText("Time Left: " + timeLeft + " seconds", bagXpos, bagYpos + (cellSize * (rows + 1)));
 
         // Render items
     items.forEach(item => {
@@ -300,38 +224,16 @@ function render() {
             ctx.fillText(item.name, item.x + item.size + 15, item.y - 15);
             ctx.fillText("Value: " + item.value, item.x + item.size + 15, item.y);
             ctx.fillText("Type: " + item.type, item.x + item.size + 15, item.y + 15);
-        }
+        }/* else if (!item.isDragging && isOverBagGrid(item)) {
+            ctx.fillStyle = item.color;
+            ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
+            console.log("2");
+        }  */
 
 
-    });
-
-    
+    }); 
 }
-
-// Function to draw a button on the canvas
-function drawButton(text) {
-    ctx.fillStyle = "white";
-    ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-    ctx.fillStyle = "black";
-    ctx.font = "24px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(text, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2 + 8);
-}
-
-
-
-// Main game loop
-function gameLoop() {
-        if (gameStarted) {
-        render();
-    }
-}
-
-
-
-
-
-        </script>
+         </script>
     </body>
     </html>
 
