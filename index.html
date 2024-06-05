@@ -19,12 +19,30 @@
             }
 			#gameCanvas {
 				display: none; /* Initially hide the game canvas */
-        }
+			}
 			#titleScreen {
 				display: block; 
-        }
+			}
 			#startButton {
-				display: block; 
+				display: block;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				font-size: 24px;
+				padding: 10px 20px;				
+			}
+		
+        h1 {
+			display: block;
+			position: absolute;
+			left: 40%;
+            font-size: 72px;
+            background: linear-gradient(180deg, red, orange, yellow);
+            -webkit-background-clip: text;
+            color: transparent;
+			 text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.5);
+            margin: 0;
         }
         </style>
     </head>
@@ -72,8 +90,13 @@ let timer;
 let timeLeft = 120;
 
 function gameOver() {
-  cancelInterval(timer);
-  $('#startButton').show();
+  clearInterval(timer);
+  clearInterval(render);
+  clearInterval(generateItems);
+  gameStarted = false;
+  gameCanvas.style.display = "none";
+  titleScreen.style.display = "block";
+  startButton.style.display = "block";
 }
 
 
@@ -200,7 +223,7 @@ function render() {
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
-    ctx.fillText("Total value:  " + calculateTotalValue(), bagXpos, bagYpos - 10);
+    ctx.fillText("Total value:  " + calculateTotalValue().toFixed(2), bagXpos, bagYpos - 10);
 	ctx.fillText("Time Left: " + timeLeft + " seconds", bagXpos, bagYpos + (cellSize * (rows + 1)));
 
         // Render items
