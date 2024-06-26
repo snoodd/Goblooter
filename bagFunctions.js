@@ -54,8 +54,6 @@ console.log(newC);
 // Function to draw bagged items inside the bag
 function drawBaggedItems(pItems) {
 		baggedItemsToBeDrawn = pItems;
-           // ctx.fillStyle = item.color;
-            //ctx.fillRect(item.x, item.y, (item.size * 1.75) * item.gridSizeX, (item.size * 1.75) * item.gridSizeY);
 if(baggedItemsToBeDrawn.length >= 1){
     for (const item of baggedItemsToBeDrawn) {
         ctx.fillStyle = item.color;

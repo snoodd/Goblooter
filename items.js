@@ -136,7 +136,7 @@ function createItem(x, y, value) {
         size: cellSize / 2,
         color: `rgb(${getRandomInt(0, 255)}, ${getRandomInt(0, 255)}, ${getRandomInt(0, 255)})`, // Random color,
         name: iteminfo[0] + iteminfo[1],
-        value: value * iteminfo[2],
+        value: value * iteminfo[2] * Math.pow(1.2, currentLevel - 1),
         type: iteminfo[1],
         shape: iteminfo[5],
         gridSizeX: iteminfo[3],
