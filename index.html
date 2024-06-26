@@ -47,6 +47,7 @@
         </style>
     </head>
     <body>
+	
         <canvas id="gameCanvas" width="1920" height="1080"></canvas>
 		<script src="bagFunctions.js"></script>
 		<script src="items.js"></script>
@@ -100,7 +101,7 @@ function calculateTargetValue(level) {
 
 
 function calculateTotalValue() {
-
+let totalValue = 0;
     for (const item of baggedItems) {
         totalValue += item.value;
     }
@@ -114,18 +115,21 @@ function levelOver() {
     if (calculateTotalValue() >= targetTotalValue  && gameStarted === true) {
         currentLevel++;
         alert(`Congratulations! You've completed level ${currentLevel - 1}. Moving to level ${currentLevel}.`);
-		baggedItems = [];
-		items = [];
 		bagCells.cells.forEach(cell => {
         cell.isOccupied = false;
         cell.occupyingItem = null;
     });
+		baggedItems = [];
+		items = [];
         setupLevel();
     } else {
+	
         gameStarted = false;
         gameCanvas.style.display = "none";
         titleScreen.style.display = "block";
-        startButton.style.display = "block";
+		startButton.style.display = "none";
+		baggedItems = [];
+		items = [];
     }
 }
 
@@ -260,7 +264,7 @@ function render() {
 	ctx.fillText("Current Level: " + currentLevel, bagXpos, bagYpos - 50);
 	ctx.fillText("Target Value: " + targetTotalValue.toFixed(2), bagXpos, bagYpos - 70);
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
-    ctx.fillText("Total value:  " + totalValue.toFixed(2), bagXpos, bagYpos - 10);
+    ctx.fillText("Total value:  " + calculateTotalValue().toFixed(2), bagXpos, bagYpos - 10);
 	ctx.fillText("Time Left: " + timeLeft + " seconds", bagXpos, bagYpos + (cellSize * (rows + 1)));
 
         // Render items

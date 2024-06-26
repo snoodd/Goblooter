@@ -177,7 +177,7 @@ function dropItemInBag(item) {
         // Add the item to the baggedItems array
         baggedItems.push(item);
         console.log("bagged items" + baggedItems);
-		totalValue = calculateTotalValue();
+		//totalValue = calculateTotalValue();
     } else {
 		console.log("empty cells " + unoccupiedCells.length + " Item Shape Length " + item.shape.length )
 		console.log("item not bagged" + baggedItems);
