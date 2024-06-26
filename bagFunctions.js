@@ -58,6 +58,7 @@ if(baggedItemsToBeDrawn.length >= 1){
     for (const item of baggedItemsToBeDrawn) {
         ctx.fillStyle = item.color;
         ctx.fillRect(item.x, item.y, ((item.size * 1.75) * item.gridSizeX), (item.size * 1.75) * item.gridSizeY);
+		
     }
 }
 }

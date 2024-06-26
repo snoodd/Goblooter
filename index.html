@@ -100,12 +100,11 @@ function calculateTargetValue(level) {
 
 
 function calculateTotalValue() {
-let totalValue = 0;
+
     for (const item of baggedItems) {
         totalValue += item.value;
     }
     return totalValue;
-
 }
 
 function levelOver() {
@@ -152,7 +151,9 @@ function startGame() {
 function setupLevel() {
     timeLeft = 10; // Reset timer for each level
 	targetTotalValue = calculateTargetValue(currentLevel);
+	totalValue = 0;
     // Start the game loop
+	generateItems();
     setInterval(generateItems, 5000);
 	timer = setInterval(updateTimer, 1000);
 }
