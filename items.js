@@ -176,8 +176,10 @@ function dropItemInBag(item) {
 		console.log(unoccupiedCells);
         // Add the item to the baggedItems array
         baggedItems.push(item);
-        console.log(baggedItems);
+        console.log("bagged items" + baggedItems);
     } else {
+		console.log("empty cells " + unoccupiedCells.length + " Item Shape Length " + item.shape.length )
+		console.log("item not bagged" + baggedItems);
 		item.isDragging = false;
 		item.isInBag = false;
         // If the item cannot fit in the bag, reset its position

@@ -56,7 +56,8 @@
 			</div>
 		<script>
 
-
+let currentLevel = 1;
+let targetTotalValue = 100; 
 const titleScreen = document.getElementById("titleScreen");
 const startButton = document.getElementById("startButton");
 const canvas = document.getElementById("gameCanvas");
@@ -64,6 +65,7 @@ const ctx = canvas.getContext("2d");
 const cellSize = 50;
 const size = 50;
 const bagPadding = 10;
+startButton.addEventListener("click", startGame);
 
 // Bag dimensions and position
 const bagXpos = 50;
@@ -74,8 +76,8 @@ let mainWidth = 800;
 let mainHeight = 600;
 
 // Array to store items
-const items = [];
-const baggedItems = [];
+let items = [];
+let baggedItems = [];
 let draggedItem;
 // Array to store cells in the bag grid
 const numbers = [];
@@ -87,20 +89,43 @@ let checkedCells;
 let highlightedCells;
 let gameStarted = false; // Flag to track if the game has started
 let timer; 
-let timeLeft = 120;
+let timeLeft = 10;
 
-function gameOver() {
-  clearInterval(timer);
-  clearInterval(render);
-  clearInterval(generateItems);
-  gameStarted = false;
-  gameCanvas.style.display = "none";
-  titleScreen.style.display = "block";
-  startButton.style.display = "block";
+function calculateTargetValue(level) {
+    return Math.floor(100 * Math.pow(1.5, level - 1));
 }
 
+function calculateTotalValue() {
+    let totalValue = 0;
+    for (const item of baggedItems) {
+        totalValue += item.value;
+    }
+    return totalValue;
 
-startButton.addEventListener("click", startGame);
+}
+
+function gameOver() {
+    clearInterval(timer);
+    clearInterval(generateItems);
+    
+
+    if (calculateTotalValue() >= targetTotalValue  && gameStarted === true) {
+        currentLevel++;
+        alert(`Congratulations! You've completed level ${currentLevel - 1}. Moving to level ${currentLevel}.`);
+		baggedItems = [];
+		items = [];
+		bagCells.cells.forEach(cell => {
+        cell.isOccupied = false;
+        cell.occupyingItem = null;
+    });
+        setupLevel();
+    } else {
+        gameStarted = false;
+        gameCanvas.style.display = "none";
+        titleScreen.style.display = "block";
+        startButton.style.display = "block";
+    }
+}
 
 function updateTimer() {
     timeLeft -= 1; // Decrease time left by 1 second
@@ -110,19 +135,25 @@ function updateTimer() {
 }
 		// Function to start the game
 function startGame() {
-	gameCanvas.style.display = "block";
-	// Start the timer for two minutes
-	timer = setInterval(updateTimer, 1000);
+	gameCanvas.style.display = "block";	
 	titleScreen.style.display = "none";
 	gameStarted = true;
-    // Render bag grid
-    initCells();
+	currentLevel = 1;
+	setInterval(render, 33);
+	initCells();
+	setupLevel();
+
+	
+}
+function setupLevel() {
+    timeLeft = 10; // Reset timer for each level
+	targetTotalValue = calculateTargetValue(currentLevel);
     generateItems();
     // Start the game loop
-    setInterval(render, 33);
     setInterval(generateItems, 5000);
-}
+	timer = setInterval(updateTimer, 1000);
 
+}
 
 
 
@@ -222,6 +253,8 @@ function render() {
 }
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
+	ctx.fillText("Current Level: " + currentLevel, bagXpos, bagYpos - 50);
+	ctx.fillText("Target Value: " + targetTotalValue.toFixed(2), bagXpos, bagYpos - 70);
     ctx.fillText("Items in bag:  " + baggedItems.length, bagXpos, bagYpos - 30);
     ctx.fillText("Total value:  " + calculateTotalValue().toFixed(2), bagXpos, bagYpos - 10);
 	ctx.fillText("Time Left: " + timeLeft + " seconds", bagXpos, bagYpos + (cellSize * (rows + 1)));

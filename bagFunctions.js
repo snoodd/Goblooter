@@ -50,14 +50,7 @@ console.log(newC);
 
 }
 
-function calculateTotalValue() {
-    let totalValue = 0;
-    for (const item of baggedItems) {
-        totalValue += item.value;
-    }
-    return totalValue;
 
-}
 // Function to draw bagged items inside the bag
 function drawBaggedItems(pItems) {
 		baggedItemsToBeDrawn = pItems;
